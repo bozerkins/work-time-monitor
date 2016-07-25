@@ -26,3 +26,14 @@ press event buttons to register events' initiation time
 ### finish your day
 to finish your workday just press the blue button at the top of the screen
 which says "Workday Stop"
+
+## authentication
+create file ./var/users.php
+the file should return a php array, which credentials
+
+file example:
+```
+<?php
+return array('myusername' => 'mypassword');
+```
+> if the file is empty - no authorization would be asked

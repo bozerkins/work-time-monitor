@@ -1,62 +1,72 @@
 <?php
 
-$realm = 'Restricted area';
-
-// check if file exists
 if (!file_exists('var/users.php')) {
     return;
 }
 
-// include the file
-$users = include 'var/users.php';
+$users = require 'var/users.php';
 
-// check if users are defined
 if (!$users || !is_array($users)) {
     return;
 }
 
+session_start();
 
-if (empty($_SERVER['PHP_AUTH_DIGEST'])) {
-    header('HTTP/1.1 401 Unauthorized');
-    header('WWW-Authenticate: Digest realm="'.$realm.
-        '",qop="auth",nonce="'.uniqid().'",opaque="'.md5($realm).'"');
-
-    die('Authorization failed');
+if (array_key_exists('authenticated', $_SESSION)) {
+    return;
 }
 
+$login = array_key_exists('login', $_POST) ? $_POST['login'] : null;
+$password = array_key_exists('password', $_POST) ? $_POST['password'] : null;
 
-// analyze the PHP_AUTH_DIGEST variable
-if (!($data = http_digest_parse($_SERVER['PHP_AUTH_DIGEST'])) ||
-    !isset($users[$data['username']]))
-    die('Invalid credentials received');
-
-
-// generate the valid response
-$A1 = md5($data['username'] . ':' . $realm . ':' . $users[$data['username']]);
-$A2 = md5($_SERVER['REQUEST_METHOD'].':'.$data['uri']);
-$valid_response = md5($A1.':'.$data['nonce'].':'.$data['nc'].':'.$data['cnonce'].':'.$data['qop'].':'.$A2);
-
-if ($data['response'] != $valid_response)
-    die('Invalid credentials received');
-
-// ok, valid username & password
-//echo 'You are logged in as: ' . $data['username'];
-
-
-// function to parse the http auth header
-function http_digest_parse($txt)
-{
-    // protect against missing data
-    $needed_parts = array('nonce'=>1, 'nc'=>1, 'cnonce'=>1, 'qop'=>1, 'username'=>1, 'uri'=>1, 'response'=>1);
-    $data = array();
-    $keys = implode('|', array_keys($needed_parts));
-
-    preg_match_all('@(' . $keys . ')=(?:([\'"])([^\2]+?)\2|([^\s,]+))@', $txt, $matches, PREG_SET_ORDER);
-
-    foreach ($matches as $m) {
-        $data[$m[1]] = $m[3] ? $m[3] : $m[4];
-        unset($needed_parts[$m[1]]);
+if (array_key_exists('submit', $_REQUEST)) {
+    if (password_verify($password, $users[$login])) {
+        $_SESSION['authenticated'] = true;
+        return;
     }
-
-    return $needed_parts ? false : $data;
 }
+
+if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+    echo json_encode(array('status' => false, 'result' => 'not authenticated'));
+    exit;
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Authentication</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="resource/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="resource/signin.css" rel="stylesheet">
+</head>
+
+<body>
+
+<div class="container">
+
+    <form class="form-signin" method="POST" action="">
+        <h2 class="form-signin-heading">Please sign in</h2>
+        <label for="inputEmail" class="sr-only">Email address</label>
+        <input name="login" type="text" id="inputEmail" class="form-control" placeholder="Username" required autofocus>
+        <label for="inputPassword" class="sr-only">Password</label>
+        <input name="password" type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+        <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Sign in</button>
+    </form>
+
+</div> <!-- /container -->
+
+</body>
+</html>
+<?php
+exit;
