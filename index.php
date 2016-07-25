@@ -1,3 +1,4 @@
+<?php require_once 'auth.php'; ?>
 <!doctype html>
 <html lang="en" ng-app="app">
 <head>
