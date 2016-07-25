@@ -1,7 +1,6 @@
 <?php
 
 require_once 'bootstrap.php';
-require_once 'auth.php';
 
 header('Content-Type: application/json');
 
