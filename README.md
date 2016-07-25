@@ -15,13 +15,13 @@ and then provides a summary for a particular work day
 to start a work day just press the blue button at the top of the screen
 which says "Workday Start"
 
->>> when you start workday - no events are started
->>> when you end workday - all the events for the workday are stoped
+> when you start workday - no events are started
+> when you end workday - all the events for the workday are stoped
 
 ### create events
 press event buttons to register events' initiation time
->>> when one event starts - the previous one ends
->>> there could only be one event active at a time
+> when one event starts - the previous one ends
+> there could only be one event active at a time
 
 ### finish your day
 to finish your workday just press the blue button at the top of the screen
@@ -36,4 +36,4 @@ file example:
 <?php
 return array('myusername' => 'mypassword');
 ```
->>> if the file is empty - no authorization would be asked
+> if the file is empty - no authorization would be asked
