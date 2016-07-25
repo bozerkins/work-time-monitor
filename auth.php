@@ -1,8 +1,19 @@
 <?php
+
 $realm = 'Restricted area';
 
-//user => password
+// check if file exists
+if (!file_exists('var/users.php')) {
+    return;
+}
+
+// include the file
 $users = include 'var/users.php';
+
+// check if users are defined
+if (!$users || !is_array($users)) {
+    return;
+}
 
 
 if (empty($_SERVER['PHP_AUTH_DIGEST'])) {
