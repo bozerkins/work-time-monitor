@@ -22,6 +22,7 @@ $password = array_key_exists('password', $_POST) ? $_POST['password'] : null;
 if (array_key_exists('submit', $_REQUEST)) {
     if (password_verify($password, $users[$login])) {
         $_SESSION['authenticated'] = true;
+        header('Location: /');
         return;
     }
 }
