@@ -34,6 +34,6 @@ the file should return a php array, which credentials
 file example:
 ```
 <?php
-return array('myusername' => 'mypassword');
+return array('myusername' => password_hash('mypassword', PASSWORD_DEFAULT));
 ```
 > if the file is empty - no authorization would be asked
